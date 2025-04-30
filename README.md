@@ -2,7 +2,7 @@
 
 Este projeto tratará, por meio de RPA, dados obtidos pela API "OpenF1". Assim, obteremos informações sobre os pilotos, carros, times, corridas, pistas a qualquer momento e de forma rápida.
 
-**Projeto em progresso, portanto este README será atualizado com mais informações**
+⚠️ **Projeto em progresso, portanto este README será atualizado com mais informações**
 
 ## Objetivos
 - Obter os dados dos pilotos com as melhores medias de tempo
