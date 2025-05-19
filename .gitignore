@@ -3,8 +3,9 @@
 venv/
 
 # arquivos sensíveis
-.env
 *.env
+.env
+.envrc
 
 # arquivos de sistema
 __pycache__/
