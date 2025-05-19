@@ -1,0 +1,61 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>F1 Insights Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1, h2 { color: #cc0000; }
+        .highlight { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h1>🏎️ F1 Insights Dashboard</h1>
+
+{% if race_data %}
+    <h2>Última Corrida: {{ race_data.race_name }} ({{ race_data.season }})</h2>
+    <p>📍 Circuito: {{ race_data.circuit_name }} - {{ race_data.location.locality }}, {{ race_data.location.country }}</p>
+    <p>📅 Data: {{ race_data.date }}</p>
+
+    <h3>🏆 Top 3 Pilotos</h3>
+    <ul>
+    {% for result in race_data.results[:3] %}
+        <li>{{ loop.index }}º - <span class="highlight">{{ result.driver }}</span> ({{ result.constructor }})</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p><strong>Erro ao carregar os dados da última corrida.</strong></p>
+{% endif %}
+
+<hr>
+
+{% if df is not none %}
+    <h2>📊 Resultados Gerais</h2>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Posição</th>
+                <th>Piloto</th>
+                <th>Equipe</th>
+                <th>Pontos</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for index, row in df.iterrows() %}
+            <tr>
+                <td>{{ row.position }}</td>
+                <td>{{ row.driver }}</td>
+                <td>{{ row.constructor }}</td>
+                <td>{{ row.points }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p><strong>Erro ao carregar CSV de resultados.</strong></p>
+{% endif %}
+
+</body>
+</html>

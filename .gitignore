@@ -1,0 +1,14 @@
+# ambiente virtual
+.venv/
+venv/
+
+# arquivos sensíveis
+.env
+
+# arquivos de sistema
+__pycache__/
+*.pyc
+*.pyo
+
+# arquivos salvos localmente
+data/

@@ -1,0 +1,6 @@
+matplotlib
+requests
+pandas
+pymongo
+python-dotenv
+fetch_data
