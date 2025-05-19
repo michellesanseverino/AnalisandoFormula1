@@ -1,61 +1,51 @@
 <!-- templates/dashboard.html -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>F1 Insights Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1, h2 { color: #cc0000; }
-        .highlight { font-weight: bold; }
-    </style>
+    <meta charset="utf-8">
+    <title>F1 Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<h1>🏎️ F1 Insights Dashboard</h1>
+<h1>{{ race["race_name"] }} - {{ race["season"] }}</h1>
+<p>Data: {{ race["date"] }}</p>
 
-{% if race_data %}
-    <h2>Última Corrida: {{ race_data.race_name }} ({{ race_data.season }})</h2>
-    <p>📍 Circuito: {{ race_data.circuit_name }} - {{ race_data.location.locality }}, {{ race_data.location.country }}</p>
-    <p>📅 Data: {{ race_data.date }}</p>
-
-    <h3>🏆 Top 3 Pilotos</h3>
-    <ul>
-    {% for result in race_data.results[:3] %}
-        <li>{{ loop.index }}º - <span class="highlight">{{ result.driver }}</span> ({{ result.constructor }})</li>
+<h2>Top 3</h2>
+<ol>
+    {% for driver in race["results"][:3] %}
+        <li>{{ driver["driver"] }} ({{ driver["constructor"] }}) - {{ driver["points"] }} pts</li>
     {% endfor %}
-    </ul>
-{% else %}
-    <p><strong>Erro ao carregar os dados da última corrida.</strong></p>
-{% endif %}
+</ol>
 
 <hr>
+<h2>Gráfico: Total de Pontos por Corrida</h2>
+<canvas id="pointsChart" width="600" height="300"></canvas>
 
-{% if df is not none %}
-    <h2>📊 Resultados Gerais</h2>
-    <table border="1" cellpadding="5">
-        <thead>
-            <tr>
-                <th>Posição</th>
-                <th>Piloto</th>
-                <th>Equipe</th>
-                <th>Pontos</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for index, row in df.iterrows() %}
-            <tr>
-                <td>{{ row.position }}</td>
-                <td>{{ row.driver }}</td>
-                <td>{{ row.constructor }}</td>
-                <td>{{ row.points }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p><strong>Erro ao carregar CSV de resultados.</strong></p>
-{% endif %}
+<script>
+fetch('/chart-data')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('pointsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Pontos Totais',
+                    data: data.points,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

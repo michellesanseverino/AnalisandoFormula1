@@ -1,42 +1,22 @@
-# -*- coding: utf-8 -*-
-
-import json
-import pandas as pd
+from flask import Flask, render_template
+from pymongo import MongoClient
 import os
-import matplotlib.pyplot as plt # type: ignore
+from dotenv import load_dotenv
 
-def load_json_data(path):
-    with open(path, 'r', encoding='utf-8') as file:
-        return json.load(file)
+load_dotenv()
+app = Flask(__name__)
 
-def show_last_race_summary(data):
-    print(f"\n🏁 Última Corrida: {data['race_name']} ({data['season']})")
-    print(f"📍 Local: {data['circuit_name']} - {data['location']['locality']}, {data['location']['country']}")
-    print("📆 Data:", data["date"])
-    print("\n🏆 Top 3 Pilotos:")
-    for i, result in enumerate(data["results"][:3], start=1):
-        print(f"{i}º - {result['driver']} ({result['constructor']})")
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client["f1_database"]
 
-def plot_results_csv(csv_path):
-    df = pd.read_csv(csv_path)
-    
-    # Número de pilotos por corrida
-    piloto_por_corrida = df.groupby('race_name')['driver'].count()
-    piloto_por_corrida.plot(kind='bar', figsize=(10,5), title='Número de pilotos por corrida')
-    plt.tight_layout()
-    plt.show()
+@app.route("/")
+def dashboard():
+    last_race = db["races"].find_one(sort=[("date", -1)])
+    next_race = db["next_race"].find_one()
+    top_pilots = list(db["standings_drivers"].find().sort("points", -1).limit(5))
+    top_teams = list(db["standings_constructors"].find().sort("points", -1).limit(5))
+
+    return render_template("dashboard.html", last_race=last_race, next_race=next_race, top_pilots=top_pilots, top_teams=top_teams)
 
 if __name__ == "__main__":
-    json_path = os.path.join("..", "data", "last_race.json")
-    csv_path = os.path.join("..", "data", "results.csv")
-
-    try:
-        data = load_json_data(json_path)
-        show_last_race_summary(data)
-    except FileNotFoundError:
-        print("❌ Arquivo JSON da corrida não encontrado.")
-
-    try:
-        plot_results_csv(csv_path)
-    except FileNotFoundError:
-        print("❌ Arquivo CSV com resultados não encontrado.")
+    app.run(debug=True)
