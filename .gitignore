@@ -4,6 +4,7 @@ venv/
 
 # arquivos sensíveis
 .env
+*.env
 
 # arquivos de sistema
 __pycache__/
